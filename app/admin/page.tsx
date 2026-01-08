@@ -7,10 +7,11 @@ import { PendingQueue } from "@/components/admin/pending-queue"
 import { CreateTaskForm } from "@/components/admin/create-task-form"
 import { OrbitalCard } from "@/components/ui/orbital-card"
 import { ActiveDirectory } from "@/components/admin/active-directory"
+import { ComplianceLog } from "@/components/admin/compliance-log"
 
 // Dashboard Component
 export default function AdminDashboard() {
-    const [activeTab, setActiveTab] = React.useState<"overview" | "recruitment" | "tasks" | "directory">("overview")
+    const [activeTab, setActiveTab] = React.useState<"overview" | "recruitment" | "tasks" | "directory" | "compliance">("overview")
     const [stats, setStats] = React.useState({
         totalEmployees: 0,
         pendingApprovals: 0,
@@ -31,12 +32,12 @@ export default function AdminDashboard() {
             const { data: { user } } = await supabase.auth.getUser()
             if (user?.email) setCurrentUserEmail(user.email)
 
-            // 1. Get Active Employees
+            // 1. Get Active & On-Hold Employees
             const { data: activeData, count: activeCount } = await supabase
                 .from("profiles")
                 .select("*", { count: "exact" })
                 .eq("role", "employee")
-                .eq("status", "active")
+                .in("status", ["active", "on_hold"])
 
             if (activeData) setActiveEmployees(activeData)
 
@@ -71,6 +72,20 @@ export default function AdminDashboard() {
         }
 
         fetchStats()
+
+        // Realtime Subscription
+        const channel = supabase
+            .channel('admin_dashboard_updates')
+            .on(
+                'postgres_changes',
+                { event: '*', schema: 'public', table: 'profiles' },
+                () => fetchStats()
+            )
+            .subscribe()
+
+        return () => {
+            supabase.removeChannel(channel)
+        }
     }, [supabase])
 
     // Clean, resolving conflicting borders
@@ -193,6 +208,7 @@ export default function AdminDashboard() {
                     <TabButton id="recruitment" label="Recruitment" icon="👥" />
                     <TabButton id="directory" label="Directory" icon="📇" />
                     <TabButton id="tasks" label="Tasks" icon="⚡" />
+                    <TabButton id="compliance" label="Compliance" icon="🛡️" />
                 </div>
 
                 {/* Content Area */}
@@ -201,6 +217,12 @@ export default function AdminDashboard() {
                         <div className="text-center py-20 opacity-50 font-mono">
                             <p className="text-4xl mb-4">🖥️</p>
                             <p>Select a module above to view details.</p>
+                        </div>
+                    )}
+
+                    {activeTab === "compliance" && (
+                        <div className="bg-white border-[3px] border-orbital-ink rounded-[2rem] p-8 shadow-[8px_8px_0px_0px_#1D1D1F]">
+                            <ComplianceLog />
                         </div>
                     )}
 
@@ -221,7 +243,7 @@ export default function AdminDashboard() {
                             <div className="flex items-center justify-between mb-8 pb-4 border-b-2 border-gray-100">
                                 <h2 className="text-2xl font-black italic uppercase">Active Directory</h2>
                                 <span className="bg-green-100 text-green-800 px-3 py-1 text-xs font-bold border-2 border-green-800 rounded-full">
-                                    {activeEmployees.length} EMPLOYEES
+                                    {activeEmployees.length} EMPLOYEES (ACTIVE & ON HOLD)
                                 </span>
                             </div>
                             <ActiveDirectory employees={activeEmployees} />
@@ -293,7 +315,7 @@ export default function AdminDashboard() {
                     )}
                 </div>
 
-            </main>
-        </div>
+            </main >
+        </div >
     )
 }

@@ -39,7 +39,7 @@ export async function updateSession(request: NextRequest) {
 
     if (user && !request.nextUrl.pathname.startsWith('/auth') && !request.nextUrl.pathname.startsWith('/account-suspended')) {
         const { data: profile } = await supabase.from('profiles').select('status').eq('id', user.id).single()
-        if (profile?.status === 'on_hold') {
+        if (profile?.status === 'on_hold' || profile?.status === 'suspended') {
             return NextResponse.redirect(new URL('/account-suspended', request.url))
         }
     }

@@ -16,7 +16,12 @@ export async function sendEmail({
 
     if (!apiKey) {
         console.error("Zepto Mail API Key missing")
-        return { success: false, error: "Configuration Error" }
+        return { success: false, error: "Configuration Error: API Key Missing" }
+    }
+
+    if (!fromEmail) {
+        console.error("Zepto Mail From Email missing")
+        return { success: false, error: "Configuration Error: From Email Missing" }
     }
 
     try {
@@ -46,7 +51,7 @@ export async function sendEmail({
 
         if (!response.ok) {
             const errorData = await response.json()
-            console.error("Zepto Mail Error:", errorData)
+            console.error("Zepto Mail Error:", JSON.stringify(errorData, null, 2))
             return { success: false, error: errorData }
         }
 

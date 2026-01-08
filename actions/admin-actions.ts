@@ -118,3 +118,129 @@ export async function createTask(formData: FormData) {
 
     revalidatePath("/admin")
 }
+
+export async function pauseAccount(userId: string, reason: string) {
+    const supabase = await createClient()
+
+    // Verify Admin
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) throw new Error("Unauthorized")
+
+    // Update status to on_hold
+    const { error, data: profile } = await supabase
+        .from("profiles")
+        .update({
+            status: "on_hold",
+            status_reason: reason // Assuming column exists or will be added
+        })
+        .eq("id", userId)
+        .select("email, full_name")
+        .single()
+
+    if (error) throw error
+
+    // Notify User
+    if (profile?.email) {
+        await sendEmail({
+            to: profile.email,
+            name: profile.full_name || "Agent",
+            subject: "MANDATE STATUS: PAUSED",
+            html: `
+                <div style="font-family: monospace; color: #1a1a1a;">
+                    <h2 style="color: #F59E0B;">ACCOUNT PAUSED</h2>
+                    <p>Agent ${profile.full_name},</p>
+                    <p>Your operational mandate has been <strong>PAUSED</strong> by Command.</p>
+                    <p><strong>Reason:</strong> ${reason}</p>
+                    <hr/>
+                    <p>This is a temporary measure. Please contact your Supervisor for clarification.</p>
+                </div>
+            `
+        })
+    }
+
+    revalidatePath("/admin")
+}
+
+export async function suspendAccount(userId: string, reason: string) {
+    const supabase = await createClient()
+
+    // Verify Admin
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) throw new Error("Unauthorized")
+
+    // Update status to suspended
+    const { error, data: profile } = await supabase
+        .from("profiles")
+        .update({
+            status: "suspended",
+            status_reason: reason
+        })
+        .eq("id", userId)
+        .select("email, full_name")
+        .single()
+
+    if (error) throw error
+
+    // Notify User
+    if (profile?.email) {
+        await sendEmail({
+            to: profile.email,
+            name: profile.full_name || "Agent",
+            subject: "MANDATE STATUS: SUSPENDED",
+            html: `
+                <div style="font-family: monospace; color: #1a1a1a;">
+                    <h2 style="color: red;">ACCOUNT SUSPENDED</h2>
+                    <p>Agent ${profile.full_name},</p>
+                    <p>Your operational mandate has been <strong>SUSPENDED</strong> indefinitely.</p>
+                    <p><strong>Reason:</strong> ${reason}</p>
+                    <p>You have been locked out of the system pending disciplinary action.</p>
+                    <hr/>
+                    <p><strong>DO NOT ATTEMPT TO LOG IN.</strong> Contact Admin immediately.</p>
+                </div>
+            `
+        })
+    }
+
+    revalidatePath("/admin")
+}
+
+export async function resumeAccount(userId: string) {
+    const supabase = await createClient()
+
+    // Verify Admin
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) throw new Error("Unauthorized")
+
+    // Update status to active
+    const { error, data: profile } = await supabase
+        .from("profiles")
+        .update({
+            status: "active",
+            status_reason: null
+        })
+        .eq("id", userId)
+        .select("email, full_name")
+        .single()
+
+    if (error) throw error
+
+    // Notify User
+    if (profile?.email) {
+        await sendEmail({
+            to: profile.email,
+            name: profile.full_name || "Agent",
+            subject: "MANDATE STATUS: RESTORED",
+            html: `
+                <div style="font-family: monospace; color: #1a1a1a;">
+                    <h2 style="color: green;">ACCESS RESTORED</h2>
+                    <p>Agent ${profile.full_name},</p>
+                    <p>Your suspension has been lifted. You may now resume operations.</p>
+                    <br/>
+                    <a href="https://ops.ibbe.in" style="background: #000; color: #fff; padding: 10px 20px; text-decoration: none; font-weight: bold;">ENTER OPERATIONS</a>
+                </div>
+            `
+        })
+    }
+
+    revalidatePath("/admin")
+}

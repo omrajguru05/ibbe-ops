@@ -80,7 +80,7 @@ export function LiveCapture({ onCapture }: LiveCaptureProps) {
                         autoPlay
                         playsInline
                         muted
-                        className="w-full h-full object-cover"
+                        className="w-full h-full object-cover transform scale-x-[-1]"
                         onLoadedMetadata={() => videoRef.current?.play()}
                     />
                 )}
@@ -89,7 +89,7 @@ export function LiveCapture({ onCapture }: LiveCaptureProps) {
                     <img
                         src={capturedImage}
                         alt="Captured identity"
-                        className="w-full h-full object-cover"
+                        className="w-full h-full object-cover transform scale-x-[-1]"
                     />
                 )}
                 <canvas ref={canvasRef} className="hidden" />
