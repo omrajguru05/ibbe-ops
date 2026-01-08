@@ -1,0 +1,25 @@
+{
+    "name": "IBBE Operational Task",
+    "short_name": "IBBE Ops",
+    "start_url": "/dashboard",
+    "display": "standalone",
+    "background_color": "#F7F2E9",
+    "theme_color": "#FFD60A",
+    "icons": [
+        {
+            "src": "/favicon.ico",
+            "sizes": "64x64 32x32 24x24 16x16",
+            "type": "image/x-icon"
+        },
+        {
+            "src": "/icon.png",
+            "sizes": "192x192",
+            "type": "image/png"
+        },
+        {
+            "src": "/icon-512.png",
+            "sizes": "512x512",
+            "type": "image/png"
+        }
+    ]
+}

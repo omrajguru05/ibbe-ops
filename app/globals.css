@@ -1,0 +1,36 @@
+@import "tailwindcss";
+
+:root {
+  /* Orbital Palette */
+  --bg: #F7F2E9;      /* Canvas Cream */
+  --surface: #FFF9F0; /* Bone White */
+  --ink: #1D1D1F;     /* Charcoal */
+  --accent: #FFD60A;  /* Orbital Yellow */
+  --blue: #2962FF;    /* Signal Blue */
+  --green: #28C76F;   /* System Green */
+}
+
+@theme {
+  --color-orbital-bg: var(--bg);
+  --color-orbital-surface: var(--surface);
+  --color-orbital-ink: var(--ink);
+  --color-orbital-accent: var(--accent);
+  --color-signal-blue: var(--blue);
+  --color-system-green: var(--green);
+  
+  --font-sans: var(--font-inter);
+  --font-mono: var(--font-jetbrains-mono);
+
+  --shadow-orbital: 8px 8px 0px 0px var(--ink);
+}
+
+body {
+  background-color: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-sans);
+}
+
+/* Custom Utility for the Perfect Circle */
+.orbital-element {
+  @apply rounded-full border-[3px] border-orbital-ink flex items-center justify-center shadow-orbital aspect-square;
+}
