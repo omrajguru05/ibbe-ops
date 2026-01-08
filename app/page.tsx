@@ -99,7 +99,7 @@ export default function Home() {
         </p>
       </div>
 
-      <OrbitalCard className="w-full max-w-md p-8 bg-white">
+      <OrbitalCard className="w-full max-w-md p-4 md:p-8 bg-white">
         <div className="flex justify-center mb-6 border-b-2 border-orbital-ink/10 pb-4">
           <button
             onClick={() => setIsLogin(false)}
