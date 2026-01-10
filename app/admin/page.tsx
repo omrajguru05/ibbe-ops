@@ -8,10 +8,11 @@ import { CreateTaskForm } from "@/components/admin/create-task-form"
 import { OrbitalCard } from "@/components/ui/orbital-card"
 import { ActiveDirectory } from "@/components/admin/active-directory"
 import { ComplianceLog } from "@/components/admin/compliance-log"
+import { EmailComposer } from "@/components/admin/email-composer"
 
 // Dashboard Component
 export default function AdminDashboard() {
-    const [activeTab, setActiveTab] = React.useState<"overview" | "recruitment" | "tasks" | "directory" | "compliance">("overview")
+    const [activeTab, setActiveTab] = React.useState<"overview" | "recruitment" | "tasks" | "directory" | "compliance" | "communication">("overview")
     const [stats, setStats] = React.useState({
         totalEmployees: 0,
         pendingApprovals: 0,
@@ -155,7 +156,7 @@ export default function AdminDashboard() {
                         <div className="absolute inset-0 bg-orbital-ink translate-x-2 translate-y-2 rounded-[2rem] transition-transform group-hover:translate-x-3 group-hover:translate-y-3" />
                         <div className="relative bg-[#1D1D1F] text-white p-6 rounded-[2rem] border-[3px] border-orbital-ink h-full flex flex-col justify-between overflow-hidden">
                             <div className="absolute top-0 right-0 p-4 opacity-10">
-                                <svg className="w-24 h-24" fill="currentColor" viewBox="0 0 24 24"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z" /></svg>
+                                <svg className="w-24 h-24" fill="currentColor" viewBox="0 0 24 24"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z" /></svg>
                             </div>
                             <div>
                                 <h3 className="font-mono text-xs text-stone-400 uppercase tracking-widest mb-1">Employees</h3>
@@ -209,6 +210,7 @@ export default function AdminDashboard() {
                     <TabButton id="directory" label="Directory" icon="📇" />
                     <TabButton id="tasks" label="Tasks" icon="⚡" />
                     <TabButton id="compliance" label="Compliance" icon="🛡️" />
+                    <TabButton id="communication" label="Comm" icon="📡" />
                 </div>
 
                 {/* Content Area */}
@@ -223,6 +225,13 @@ export default function AdminDashboard() {
                     {activeTab === "compliance" && (
                         <div className="bg-white border-[3px] border-orbital-ink rounded-[2rem] p-8 shadow-[8px_8px_0px_0px_#1D1D1F]">
                             <ComplianceLog />
+                        </div>
+                    )}
+
+                    {activeTab === "communication" && (
+                        <div className="">
+                            <h2 className="text-2xl font-black italic uppercase mb-8 ml-2">Secure Channel</h2>
+                            <EmailComposer />
                         </div>
                     )}
 

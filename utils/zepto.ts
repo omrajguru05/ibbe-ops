@@ -4,22 +4,26 @@ export async function sendEmail({
     subject,
     html,
     name,
+    fromEmail,
+    fromName,
 }: {
     to: string
     subject: string
     html: string
     name: string
+    fromEmail?: string
+    fromName?: string
 }) {
     const apiKey = process.env.ZEPTO_MAIL_API_KEY
-    const fromEmail = process.env.NEXT_PUBLIC_ZEPTO_FROM_EMAIL
-    const fromName = "IBBE Operations"
+    const defaultFromEmail = process.env.NEXT_PUBLIC_ZEPTO_FROM_EMAIL
+    const defaultFromName = "IBBE Operations"
 
     if (!apiKey) {
         console.error("Zepto Mail API Key missing")
         return { success: false, error: "Configuration Error: API Key Missing" }
     }
 
-    if (!fromEmail) {
+    if (!defaultFromEmail && !fromEmail) {
         console.error("Zepto Mail From Email missing")
         return { success: false, error: "Configuration Error: From Email Missing" }
     }
@@ -33,8 +37,8 @@ export async function sendEmail({
             },
             body: JSON.stringify({
                 from: {
-                    address: fromEmail,
-                    name: fromName,
+                    address: fromEmail || defaultFromEmail,
+                    name: fromName || defaultFromName,
                 },
                 to: [
                     {
@@ -50,14 +54,28 @@ export async function sendEmail({
         })
 
         if (!response.ok) {
-            const errorData = await response.json()
-            console.error("Zepto Mail Error:", JSON.stringify(errorData, null, 2))
-            return { success: false, error: errorData }
+            // Try to get error details, but handle empty/invalid responses
+            let errorMessage = `HTTP ${response.status}: ${response.statusText}`
+            try {
+                const responseText = await response.text()
+                if (responseText) {
+                    try {
+                        const errorData = JSON.parse(responseText)
+                        errorMessage = errorData.message || errorData.error || JSON.stringify(errorData)
+                    } catch {
+                        errorMessage = responseText
+                    }
+                }
+            } catch (e) {
+                // Keep the default HTTP error message
+            }
+            console.error("Zepto Mail Error:", errorMessage)
+            return { success: false, error: errorMessage }
         }
 
         return { success: true }
-    } catch (error) {
+    } catch (error: any) {
         console.error("Email Sending Failed:", error)
-        return { success: false, error }
+        return { success: false, error: error?.message || "Network error while sending email" }
     }
 }
